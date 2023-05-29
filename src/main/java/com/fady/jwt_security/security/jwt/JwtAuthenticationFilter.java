@@ -23,21 +23,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        // get the jwt token and check its exists
-        final String authHeader = request.getHeader("Authorization");
-
-        // the variable to hold the token
-        final String jwt;
-
         final String email;
 
-        // 1. checks that token exists
+        // 1. get the jwt token and check its exists
+        final String authHeader = request.getHeader("Authorization");
+
+        // 2. checks that token exists
         var isTokenExists = CheckIfJwtTokenExists(authHeader);
         if (!isTokenExists)
             filterChain.doFilter(request, response);
 
         // 2. extract the token from the header
-        jwt = authHeader.substring(7); // starts from position 7
+        final String jwt = ExtractTokenFromAuthorizationHeader(authHeader);
 
         // 3. call the jwt-service to extract the username from the token
 
@@ -52,6 +49,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } else {
             return true;
         }
+    }
+
+    private String ExtractTokenFromAuthorizationHeader(String authHeader) {
+        return authHeader.substring(7);
     }
 
 }
